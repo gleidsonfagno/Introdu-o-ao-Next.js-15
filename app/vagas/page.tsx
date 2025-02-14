@@ -1,22 +1,28 @@
-import JobItem from "@/components/cardes/job-tem";
+import JobItem from "@/components/cardes/job-item";
 import { job } from "@/lib/types";
-// const jobs = 
-//   {
-//     id: "1",
-//     title: "Designer",
-//     company: "Google",
-//     city: "São Paulo",
-//     salary: "R$ 5.000,00",
-//   }
 
-export default async function Vagas() {
-
+async function fetchJobs() {
   const response = await fetch("https://apis.codante.io/api/job-board/jobs", {
     cache: "no-store",
   });
+  
+  if (!response.ok) {
+    throw new Error("Failed to fetch jobs");
+  }
+
   const json = await response.json();
   const jobs: job[] =  json.data;
-  console.log(json.data);
+  
+  return jobs
+}
+
+
+export default async function Vagas() {
+  const jobs = await fetchJobs();
+
+  if(!jobs) {
+    throw new Error("Failed to fetch jobs");
+  }
 
   return (
     <main className="py-10">
@@ -26,11 +32,6 @@ export default async function Vagas() {
         {
           jobs.map((job) => <JobItem key={job.id} job={job} />)
         }
-
-        {/* <JobItem job={jobs} />
-        <JobItem job={jobs} />
-        <JobItem job={jobs} />
-        <JobItem job={jobs} /> */}
       </div>
     </main>
   );
